@@ -13,7 +13,7 @@ app.listen(3000, () => console.log(`PROPER FUNCTIONING`));
   
 const mongoose = require("mongoose");
 
-mongoose.connect("mongodb+srv://AddXvol:631QMqhD7HJVUitR@addxvol.sz69u.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", {
+mongoose.connect("mongodb", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     keepAlive: true,
@@ -27,7 +27,7 @@ const bot = new Aoijs.Bot({
     connectedBots: true, 
 sharding: true,
 shardAmount: 100,
-    token:"ODk2MzAzOTQ3MzExMTA0MDQx.YWFKGQ.WaVuPZ2U3O_4UUaTFK_GsHmn5E8", //paste your token here
+    token: process.env.TOKEN, //make a secret named TOKEN and in value put ur token
 
     prefix:['$getservervar[prefix]','$getglobaluservar[up]'], //change the prefix in line 270
 fetchInvites: true
