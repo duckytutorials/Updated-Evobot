@@ -15,4 +15,6 @@
 
 The official project is [here](https://dashboard.evobot.repl.co)
 
-![GitHub Logo](/images/logo.png)
+------------ | -------------
+pls give credit if you use it in your server
+i would greatly appreciate it
