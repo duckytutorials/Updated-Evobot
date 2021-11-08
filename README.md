@@ -16,7 +16,6 @@
 The official project is [here](https://dashboard.evobot.repl.co)
 
 ------------ | -------------
+
 pls give credit if you use it in your server
 i would greatly appreciate it
-
-
