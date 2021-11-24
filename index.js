@@ -1,3 +1,5 @@
+console.log("NodeJS Version: " + process.version)
+
 const Aoijs = require("aoi.js");
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -17,11 +19,15 @@ const bot = new Aoijs.Bot({
         connectedBots: true, 
 sharding: true,
 shardAmount: 100,
-    token:"token", //paste your token here
+    token: process.env.TOKEN
 
-    prefix:['$getservervar[prefix]','$getglobaluservar[up]'], //change the prefix in line 270
-fetchInvites: true
-    
+    prefix:['$getservervar[prefix]','$getglobaluservar[up]'], //change the prefix in variables
+  mobile: false,
+suppressAll: true,
+errorMessage: "",
+fetchInvites: true,
+applicationCache: true,
+intents: "all"
 })
 
 const disbut = require('discord-buttons') 
@@ -173,17 +179,13 @@ $endIf
 `
 })
 
-bot.botJoinCommand({
-channel: "$systemChannelID",
-code: ` 
-$description[hi i am Evobot thank you for inviting me. my prefix is **>** and
-my features are:
-<:economy:898404177955401759> economy
-<:music:896761748676280401> music
-<:moderation:905787390302490624> moderation
-<:leveling:896951309809365024> leveling
-<:fun:896761813251809280> fun
-]`})
+bot.command({
+name: "splitText",
+code: `
+$splitText[1] test1
+$splitText[2] test2
+`
+})
 
 bot.joinCommand({
   channel: "$getServerVar[verifchannel]",
@@ -283,7 +285,8 @@ $removetextsplitelement[$gettextsplitlength]
 $textsplit[$getmessagevar[joinedusers;$get[e]];@]
 $let[participated;$getmessagevar[joined;$get[e]]]
 $let[e;$get[msg]]
-$onlyif[$get[condition]==perform;]
+$onlyif[$get[condition]
+})==perform;]
 $interactionreply[$replacetext[$replacetext[$replacetext[$get[condition];perform;Rerolled the giveaway];true;This giveaway has not ended yet];false;You do not have enough perms];;;64]
 $let[condition;$replacetext[$replacetext[$getmessagevar[ended;$get[msg]];true;$replacetext[$replacetext[$get[condition];true;perform];false;false]];false;$get[condition]]]
 $let[condition;$hasperms[$authorid;manageserver]]
@@ -536,7 +539,7 @@ bot.command({
 name: "shop", 
 code: `$thumbnail[$authorAvatar]
 $title[Economy Shop]
-$color[RANDOM]
+$color[#2f3136]
 $description[
 $addField[__Items:__;
 💼 **$250 | bag**
@@ -549,8 +552,10 @@ $addField[__Items:__;
 🏫 **$50,000 | apartment**
 🏡 **$100,000 | house**
 🏰 **$500,000 | mansion**
-<a:shovel:908937674889523220> **$100 | shovel**
-<:fishingpole:906392489747963934>  **$100 | fishing-pole**
+<a:shovel:908937674889523220> **$105 | shovel**
+<:fishingpole:906392489747963934>  **$150 | fishing-pole**
+<:pickaxe:909402020044238860> **$100 | pickaxe**
+<:plant:909421404204699679> **$100 | plant**
 ]
 
 $addField[__badges:__;
@@ -598,6 +603,20 @@ $description[
 Nice! You bought a smartphone for $500!
 ]
 $footer[This item is used to commit a heist]`
+})
+
+bot.command({
+name: "buy-plant", 
+code: `$setGlobalUserVar[Wallet;$sub[$getGlobalUserVar[Wallet;$authorID];100];$authorID]
+$setGlobalUserVar[plant;$sum[$getGlobalUserVar[plant;$authorID];1];$authorID]
+$onlyIf[$getGlobalUserVar[Wallet;$authorID]>=99;Need $100 in your wallet, try withrawing it first.]
+$thumbnail[$authorAvatar]
+$color[RANDOM]
+$title[<:plant:90942>buy-plant1404204699679> $username]
+$description[
+Nice! You bought a plant for $100!
+]
+$footer[Usage: $getServerVar[prefix]buy-plant]`
 })
  
 bot.command({
@@ -704,30 +723,44 @@ $footer[This item is a badge]`
 
 bot.command({
 name: "buy-fishing-pole",
-code: `$setGlobalUserVar[Wallet;$sub[$getGlobalUserVar[Wallet;$authorID];100];$authorID]
+code: `$setGlobalUserVar[Wallet;$sub[$getGlobalUserVar[Wallet;$authorID];150];$authorID]
 $setGlobalUserVar[fishingpole;$sum[$getGlobalUserVar[fishingpole;$authorID];1];$authorID]
-$onlyIf[$getGlobalUserVar[Wallet;$authorID]>99;Need $100 in your wallet, try withrawing it first.]
+$onlyIf[$getGlobalUserVar[Wallet;$authorID]>149;Need $150 in your wallet, try withrawing it first.]
 $thumbnail[$authorAvatar]
 $color[RANDOM]
 $title[<:fishingpole:906392489747963934> $username]
 $description[
-Nice! You bought the fishing pole for $100!
+Nice! You bought the fishing pole for $150!
 ]
 $footer[This item is a fishing pole]`
 })
 
 bot.command({
 name: "buy-shovel",
-code: `$setGlobalUserVar[Wallet;$sub[$getGlobalUserVar[Wallet;$authorID];100];$authorID]
+code: `$setGlobalUserVar[Wallet;$sub[$getGlobalUserVar[Wallet;$authorID];105];$authorID]
 $setGlobalUserVar[shovel;$sum[$getGlobalUserVar[shovel;$authorID];1];$authorID]
-$onlyIf[$getGlobalUserVar[Wallet;$authorID]>99;Need $100 in your wallet, try withrawing it first.]
+$onlyIf[$getGlobalUserVar[Wallet;$authorID]>104;Need $105 in your wallet, try withrawing it first.]
 $thumbnail[$authorAvatar]
 $color[RANDOM]
 $title[<a:shovel:908937674889523220> $username]
 $description[
-Nice! You bought the shovel for $100!
+Nice! You bought the shovel for $105!
 ]
 $footer[This item is a shovel]`
+})
+
+bot.command({
+name: "buy-pickaxe",
+code: `$setGlobalUserVar[Wallet;$sub[$getGlobalUserVar[Wallet;$authorID];100];$authorID]
+$setGlobalUserVar[pickaxe;$sum[$getGlobalUserVar[pickaxe;$authorID];1];$authorID]
+$onlyIf[$getGlobalUserVar[Wallet;$authorID]>99;Need $100 in your wallet, try withrawing it first.]
+$thumbnail[$authorAvatar]
+$color[RANDOM]
+$title[<:pickaxe:909402020044238860> $username]
+$description[
+Nice! You bought the pickaxe for $100!
+]
+$footer[This item is a pickaxe]`
 })
 
 bot.command({
@@ -971,7 +1004,8 @@ $onlyIf[$getGlobalUserVar[car;$authorID]>=1;You need at least 1 \`Car\` in your 
 bot.command({
 name: "inventory",
 aliasis: "inv",
-code: `$title[$usernames inventory]
+code: `$color[#2f3136]
+$title[$usernames inventory]
 $description[**__Chests__**:
 <a:dailychest:909299694335840258> **$getGlobalUserVar[DailyChest;$mentioned[1;yes]]** | Daily
 <:luckytreasure:909299176758714418> **$getGlobalUserVar[lucky;$mentioned[1;yes]]** | Lucky
@@ -996,7 +1030,10 @@ $description[**__Chests__**:
 <:fishingpole:906392489747963934> ($getGlobalUserVar[fishingpole;$mentioned[1;yes]]) fishing pole
 <:rifile:906391069657292800> ($getGlobalUserVar[gun;$mentioned[1;yes]]) rifile
 <:spinner:906391317381283900> ($getGlobalUserVar[spinner;$mentioned[1;yes]]) fidget spinner
-]
+<:Stone:909389241547620373> ($getGlobalUserVar[stone;$mentioned[1;yes]]) stone
+<:pickaxe:909402020044238860> ($getGlobalUserVar[pickaxe;$mentioned[1;yes]]) pickaxe
+<a:shovel:908937674889523220> ($getGlobalUserVar[shovel;$mentioned[1;yes]]) shovel
+<:plant:909421404204699679> ($getGlobalUserVar[plant;$mentioned[1;yes]]) plant
 `
 })
 
@@ -1077,7 +1114,7 @@ $description[
 you sold a fish for money!
 ]
 $footer[💵 +$$numberSeparator[$random[500;1000]] | 🗡 +$random[50;100]xp]
-$globalCooldown[1m;Real estate investors aren't made of money and they can only buy your assets once every 12 hours! Try again in \`%time%\`]
+$globalCooldown[1m;you cant sell that many items to one buyer!]
 $onlyIf[$getGlobalUserVar[fish;$authorID]>=1;You need to have fished at least 1 \`fish\` to sell]` 
 })
 
@@ -1093,7 +1130,7 @@ $description[
 you sold a dirt for money!
 ]
 $footer[💵 +$$numberSeparator[$random[100;500]] | 🗡 +$random[50;100]xp]
-$globalCooldown[1m;Real estate investors aren't made of money and they can only buy your assets once every 12 hours! Try again in \`%time%\`]
+$globalCooldown[1m;you cant sell that many items to one buyer!]
 $onlyIf[$getGlobalUserVar[dirt;$authorID]>=1;You need to have digged at least 1 \`dirt\` to sell]` 
 })
 
@@ -1109,7 +1146,7 @@ $description[
 you sold a rare fish for money!
 ]
 $footer[💵 +$$numberSeparator[$random[120;530]] | 🗡 +$random[55;150]xp]
-$globalCooldown[1m;Real estate investors aren't made of money and they can only buy your assets once every 12 hours! Try again in \`%time%\`]
+$globalCooldown[1m;you cant sell that many items to one buyer!]
 $onlyIf[$getGlobalUserVar[rare;$authorID]>=1;You need to have fished at least 1 \`rare fish\` to sell]` 
 })
 
@@ -1125,7 +1162,7 @@ $description[
 you sold a exotic fish for money!
 ]
 $footer[💵 +$$numberSeparator[$random[4000;5000]] | 🗡 +$random[1000;1500]xp]
-$globalCooldown[1m;Real estate investors aren't made of money and they can only buy your assets once every 12 hours! Try again in \`%time%\`]
+$globalCooldown[1m;you cant sell that many items to one buyer!]
 $onlyIf[$getGlobalUserVar[exotic;$authorID]>=1;You need to have fished at least 1 \`exotic fish\` to sell]` 
 })
 
@@ -1141,7 +1178,7 @@ $description[
 you sold a legendery fish for money!
 ]
 $footer[💵 +$$numberSeparator[$random[5000;10000]] | 🗡 +$random[2500;5000]xp]
-$globalCooldown[1m;Real estate investors aren't made of money and they can only buy your assets once every 12 hours! Try again in \`%time%\`]
+$globalCooldown[1m;you cant sell that many items to one buyer!]
 $onlyIf[$getGlobalUserVar[legendery;$authorID]>=1;You need to have fished at least 1 \`legendery fish\` to sell]` 
 })
 
@@ -1191,6 +1228,22 @@ you sold a fishing pole for money!
 $footer[💵 +$$numberSeparator[$random[50;150]] | 🗡 +$random[25;50]xp]
 $globalCooldown[1m;you cant sell many things to one seller \`%time%\`]
 $onlyIf[$getGlobalUserVar[fishing pole;$authorID]>=1;You need to have at least 1 \`fishing pole\` to sell]` 
+})
+
+bot.command({
+name: "sell-stone", 
+code: `$setGlobalUserVar[Wallet;$sum[$getGlobalUserVar[Wallet;$authorID];$random[100;1000]];$authorID]
+$setGlobalUserVar[stone;$sub[$getGlobalUserVar[stone;$authorID];1];$authorID]
+$setGlobalUserVar[XP;$sum[$getGlobalUserVar[XP;$authorID];$random[50;100]];$authorID]
+$thumbnail[$userAvatar[$authorID]]
+$color[RANDOM]
+$title[sold a stone]
+$description[
+you sold some stone for money!
+]
+$footer[💵 +$$numberSeparator[$random[100;1000]] | 🗡 +$random[50;100]xp]
+$globalCooldown[1m;you cant over feed them with items! They are not money printing people!
+$onlyIf[$getGlobalUserVar[stone;$authorID]>=1;You need to have mined at least 1 \`stone\` to sell]` 
 })
 
 bot.command({
@@ -1244,7 +1297,7 @@ $if[$random[1;4]==1]
 $color[RANDOM]
 $setGlobalUserVar[spinner;$sum[$getGlobalUserVar[spinner];1]]
 $title[$username is digging]
-$description[You dugged up a <:spinner:906391317381283900> and you get $$random[50;1000]]
+$description[You dugged up a <:spinner:906391317381283900>
 $globalCooldown[1m;**⏳ You can dig again in %time%**
 $onlyIf[$getGlobalUserVar[shovel;$authorID]>=1;You need to have bought at least 1 \`shovel\` to dig]]
 $else
@@ -1306,7 +1359,7 @@ $title[Reset]
 $description[Economy has been reset for all guilds]
 $footer[Economy Commands]
 $color[RANDOM]
-$onlyForIDs[782896548496277507;**⛔ You're not the owner of this bot**]` 
+$onlyForIDs[$ownerId;**⛔ You're not the owner of this bot**]` 
 })
 
 
@@ -2131,6 +2184,230 @@ $onlyIf[$voiceID!=;$getVar[errorjoin]]
 $suppressErrors
 $interactionReply[\`$userTag[$authorID]\` using slash.]`
 })
+
+bot.interactionCommand({
+name: "loop",
+code: `$setServerVar[durationcache;0]
+$setServerVar[filters;none]
+$loopSong
+$if[$getGlobalUserVar[controlreact]==0]
+$sendMessage[$getVar[loop];no]
+$elseIf[$getGlobalUserVar[controlreact]==1]
+$addCmdReactions[⏹]
+$onlyBotPerms[addreactions;]
+$endelseif
+$endif
+$setGlobalUserVar[commanduserused;$sum[$getGlobalUserVar[commanduserused];1]]
+$onlyIf[$queueLength!=0;$getVar[errorqueue]]
+$onlyIf[$replaceText[$replaceText[$checkCondition[$getServerVar[userid]==default];true;$authorID];false;$getServerVar[userid]]==$authorID;{title:❌ You cant use this command} {color:$getVar[color]}]
+$onlyIf[$voiceID!=;$getVar[errorjoin]]
+$suppressErrors
+$interactionReply[\`$userTag[$authorID]\` using slash.]`
+})
+
+bot.interactionCommand({
+name: "botinfo",
+code: `$title[Botinfo ($username[$clientID])
+    $color[RANDOM]
+    $thumbnail[$userAvatar[$clientID]]
+    $addField[RAM; $ramMB]
+    $addField[CPU Usage; $cpu/100]
+    $addField[Ping; $pingms]
+    $addField[Uptime;$uptime]
+    $addField[Commands; $commandsCount]
+    $addField[Users;$allMembersCount]
+    $addField[Channels;$allChannelsCount]
+    $addField[Servers;$serverCount]
+    $addField[Version;5.0.4]
+    $addField[Created;$creationDate[$clientID]]
+    $addField[Developer;$userTag[$botOwnerID]]
+$addfield[$djsEval[require ('os').platform();yes];yes]]
+    $addTimestamp
+    $cooldown[5s;{description:A bit too fast there. Wait for **%time%**!}{color:#2f3136}
+$interactionReply[\`$userTag[$authorID]\` using slash.]`
+})
+
+bot.interactionCommand({
+ name: "clear",
+  aliases: "purge",
+  code: `$author[$userTag[$authorID];$authorAvatar]
+  $title[successfully deleted $message[1] $replaceText[$replaceText[$checkCondition[$message[1]>1];true;messages];false;message]]
+  $color[RANDOM]
+  $addTimestamp
+$interactionReply[\`$userTag[$authorID]\` using slash.]`
+})
+
+bot.interactionCommand({
+  name: "afk",
+  code: `
+    $title[Set your status to afk!]
+    $description[Reason: $noMentionMessage]
+    $color[#206694]
+    $setUserVar[afk;AFK;$authorID]
+    $setUserVar[reason;$noMentionMessage]  
+$interactionReply[\`$userTag[$authorID]\` using slash.]`
+})                                                                                                          
+
+bot.interactionCommand({
+    name: "uptime",
+    code: `$title[My uptime and usage]
+$color[#2C2F33]
+    $description[
+    $addfield[RAM; $ramMB]
+    $addfield[CPU Usage; $cpu/100]
+    $addfield[Ping; $pingms]
+   $addfield[Uptime;$uptime]                                                                                                                
+$interactionReply[\`$userTag[$authorID]\` using slash.]`
+})                                                                                                                        
+  
+bot.interactionCommand({
+     name: "help",
+    code: `
+    $buttonCollector[$get[id];$authorID;1m;1,2,3,4,5,6,7,8,0;await1,await2,await3,await4,await5,await6,await7,await0;Only $userName can use this interaction,,64]
+       $let[id;$apiMessage[$channelId;;{title:Help}{description:
+    
+  }
+{color:RANDOM}{footer: Page 0/7};{actionRow:Previous Page,2,1,0,,true:Next Page,2,1,1,,false};;yes]]`,
+}, {
+    type: "awaitedCommand",
+    name: "await1",
+    code: `$interactionReply[;{title:<:leveling:896951309809365024> Leveling Commands} {description:set-levelling ¦ Enable level system.
+set-card ¦ Set the rank background.
+level-message ¦ make a level up message!
+level-role ¦ set a level role.
+rank ¦ show your rank our someones.
+set-rank ¦ set your rank.
+      }{color:RANDOM}{footer: Page 1/7};{actionRow:Previous Page,2,1,await0,,false:Next Page,2,1,2,,false};;7]`},
+                 {
+    type: "awaitedCommand",
+    name: "await2",
+    code: `$interactionReply[;{title:<:economy:898404177955401759> Economy Commands} {description:work ¦ work for money
+beg ¦ beg for money
+bal ¦ balance
+profile ¦ show ur profile
+deposit ¦ deposit money
+withdraw ¦ withdrawl some cash
+daily ¦ get daily money
+heist ¦ heist
+give money ¦ give some money
+shop ¦ buy some stuff
+rob ¦ rob a user
+steal ¦ steal money
+search ¦ search items
+scrap-car ¦ scrap a car for money
+scrap-truck ¦ scrap a truch for more money
+scrap-helicopter ¦ scrap a helicopter for even more money
+flip-house ¦ flip a house for money
+flip-apartment ¦ flip a apartment for even more money
+lb-bank ¦ bank leaderboard
+lb-wallet ¦ wallet leaderboard
+reset ¦ reset money in all guilds
+dig ¦ dig for money
+fish ¦ fish for money
+mine ¦ mining is over powered
+inventory ¦ shows ur inventory
+ 
+}{color:RANDOM}{footer: Page 2/7};{actionRow:Previous Page,2,1,1,,false:Next Page,2,1,3,,false};;7]`},
+                 {
+    type: "awaitedCommand",
+    name: "await3",
+    code: `$interactionReply[;{title:<:music:896761748676280401> Music Commands} {description:play ¦ Play a song.
+playskip  ¦ skip the playing song
+pause ¦ pause
+resume ¦ resume a song
+stop ¦ stop the song
+nowplaying ¦ the songs thats playing
+loop ¦ loop
+shuffle ¦ shuffle
+shuffleskip ¦ skip the suffle
+pruning ¦ pruning
+skip ¦ skip
+clearqueue ¦ clear queue
+queue ¦ queue
+qloop ¦ qloop
+seek ¦  seek
+remove ¦ remove 
+volume ¦ volume
+filter ¦ filter
+musicsettings ¦ musicsettings
+
+> playlist
+
+playlist
+playlist-add
+playlist-remove
+playlist-play
+
+
+}{color:RANDOM}{footer:Page 3/7};{actionRow:Previous page,2,1,2,,false:Next Page,2,1,4,,false};;7]`},{
+    type: "awaitedCommand",
+    name: "await4",
+    code: `$interactionReply[;{title:<:fun:907137201014472724> Fun Commands} {description:guess ¦ Play guess the number.
+quote ¦ Quote a message.
+editsnipe ¦ Check edited messages.
+snipe ¦ Snipe recently deleted messages.
+addemoji ¦ Add an emoji.
+func ¦ Check aoi.js commandlist.
+hack ¦ Hack a user.
+jumbo ¦ Enlarge an emote.
+8ball ¦ Ask the 8ball questions.
+info ¦ Check users info.
+avatar ¦ See users avatar
+invite ¦ Invite me.
+botinfo ¦ bot info
+say ¦ make the bot say something
+
+       }{color:RANDOM}{footer: Page 4/7};{actionRow:Previous Page,2,1,3,,false:Next Page,2,1,5,,false};;7]`},
+                 {
+     type: "awaitedCommand",
+    name: "await5",
+    code: `$interactionReply[;{title:<:slashcommands:899663302395846726> Slash Commands}{description:not added yet
+
+        
+       }{color:RANDOM}{footer: Page 5/7};{actionRow:Previous Page,2,1,4,,false:Next Page,2,1,6,,false};;7]
+`},{
+    type: "awaitedCommand",
+    name: "await6",
+    code: `
+$interactionReply[;{title:<:moderation:905787390302490624> Admin Only Commands} {description:ban ¦ Ban a user.
+banalt ¦ Bans a account if younger than 30d.
+kick ¦ Kick a user.
+setmute ¦ Set the muterole.
+mute ¦ Mute a user.
+unmute ¦ Unmute a user.
+tempmute ¦ Temporarily mute a user.
+warn ¦ Warn a user.
+infractions ¦ Check user infractions.
+clear ¦ Clear messages.
+tempban ¦ Temporarily ban a user.
+clearwarns ¦ Clear user's warnings.
+role ¦ Role a user.
+removerole ¦ Remove a user's role.
+temprole 
+prefix 
+ 
+}
+ {color:RANDOM}{footer: Page 6/7};{actionRow:Previous Page,2,1,5,,false:Next Page,2,1,7,,false};;7]
+$onlyPerms[admin;<@!$authorID> {title:Admin only} {description:Only admins can see  these commands}]`
+                 }, {
+    type: "awaitedCommand",
+    name: "await7",
+    code: `
+$interactionReply[;{title:<:dev:906193805466808380> Developer Only} {description:reboot ¦ reboot the bot
+eval ¦ hmmmmmmm
+**
+Developer Only Commands 
+**
+       }{color:RANDOM}{footer: Page 7/7};{actionRow:Previous Page,2,1,6,,false:Next Page,2,1,0,,true};;7]
+$onlyForIDs[$ownerID;<@!$authorID> {title:Developer only} {description:Only my Developer can see these commands}]`
+              },{
+  type: "awaitedCommand",
+    name: "await0",
+    code: `$interactionReply[;{title:Help}{description:
+    }
+{color:RANDOM}{footer: Page 0/7};{actionRow:Previous Page 1,2,1,2,,true:Next Page,2,1,1,,false};;yes]                                                          $interactionReply[$interactionReply[\`$userTag[$authorID]\` using slash.]`
+})                                                              
+                                                                                                                
 
 bot.musicStartCommand({
   channel: "$channelID",
@@ -3117,23 +3394,6 @@ $suppressErrors[something just happened.]`
 })
 
 bot.command({
-  name: "slash",
-  cooldown: "3s",
-  code: `$createSlashCommand[$guildID;play;Play song;song:Support YouTube & Soundcloud:true:3]
-$createSlashCommand[$guildID;filter;For list, just leave blank;filter:Use FIlter:false:3]
-$createSlashCommand[$guildID;resume;Resume Song]
-$createSlashCommand[$guildID;pause;Pause Song]
-$createSlashCommand[$guildID;stop;Stop Song]
-$title[Successfully created]
-$description[You can use slash command now.] $color[$getVar[color]]
-$footer[Status: $replaceText[$replaceText[$checkCondition[$getSlashCommandID[pause]!=];true;Update];false;Create]]
-$setGlobalUserVar[commanduserused;$sum[$getGlobalUserVar[commanduserused];1]]
-$cooldown[$commandInfo[slash;cooldown];Please wait **%time%** before using again.]
-$onlyPerms[manageserver;You didnt have permission **Manage Server**.]
-$suppressErrors[failed.]`
-});
-
-bot.command({
   name: "pause",
   cooldown: "3s",
   code: `$pauseSong
@@ -3246,13 +3506,6 @@ $addCmdReactions[✅]
 $endelseif
 $endif
 $onlyIf[$checkContains[$botOwnerID;$authorID]!=false;]`
-});
-
-bot.command({
-  name: "eval",
-  code: `$eval[$message]
-$onlyIf[$checkContains[$botOwnerID;$authorID]!=false;]
-$argsCheck[>1;what]`
 });
 
 bot.command({
@@ -3628,3 +3881,19 @@ $cooldown[$commandInfo[volume;cooldown];Please wait **%time%** before using agai
 $onlyIf[$voiceID!=;$getVar[errorjoin]]
 $suppressErrors[something just happened.]`
 });
+
+bot.command({
+  name: "farm",
+  description: "Work at a farm and get some money",
+  usage: "$getserverVar[prefix]farm",
+  code: `
+Pog you farmed up $message pepper plants and earned \`$numberSeparator[$multi[$message;60];,]\`<:plant:909421404204699679>!
+$setGlobalUserVar[plant;$sub[$getGlobalUserVar[plant];$multi[$message;1]]]
+  $setGlobalUserVar[money;$sum[$getGlobalUserVar[money];$multi[$message;60]]]
+  $globalcooldown[1m;Sorry the farm is closed for the next %time%]
+$onlyIf[$getGlobalUserVar[money]<=1500000;You have reached max go buy some items because your balance can not be more than \`1,500,000\`]
+$onlyIf[$getGlobalUserVar[plant]>=$message;You dont have enough plants]
+$onlyIf[$message>=1;**SPECIFY AN AMOUNT**]
+$onlyIf[$getGlobalUserVar[Blacklist;$authorID]==false;{author:Oh no} {color:RED} {thumbnail:https://media.discordapp.net/attachments/903038778229268541/903415958243246100/22841a994e9477aaf121a8844c07ebf0.png} {description:Oh no <@$authorID> you are blacklisted from using my commands make sure to dm my Owner $userTag[$botownerid] for more info}]
+`
+})
