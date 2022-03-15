@@ -1,3 +1,6 @@
+# Notice
+> Out of date
+
 # Nova
 The GitHub Repository of a very *epic* bot known as **Nova**
 
